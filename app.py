@@ -23,7 +23,7 @@ def progress_hook(d):
 
         # Enviar progresso ao front-end
         socketio.emit('progress', {'percent': percent, 'speed': speed, 'eta': eta}, namespace='/')
-        time.sleep(0.1)  # Força um pequeno atraso para garantir atualizações frequentes
+        #time.sleep(0.1)  # Força um pequeno atraso para garantir atualizações frequentes
 
 def baixar_playlist(url):
     ydl_opts = {
