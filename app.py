@@ -52,7 +52,7 @@ def baixar_playlist(url):
     except Exception as e:
         return f"Erro ao processar a URL: {e}"
 
-def excluir_arquivo(file_path, delay=30):
+def excluir_arquivo(file_path, delay=999):
     threading.Timer(delay, lambda: os.remove(file_path) if os.path.exists(file_path) else None).start()
 
 @app.route('/download/<filename>')
