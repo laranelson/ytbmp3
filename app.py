@@ -6,7 +6,7 @@ import threading
 import time
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 UPLOAD_FOLDER = 'downloads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -22,7 +22,7 @@ def progress_hook(d):
         eta = d.get('_eta_str', '0s')
 
         # Enviar progresso ao front-end
-        socketio.emit('progress', {'percent': percent, 'speed': speed, 'eta': eta})
+        socketio.emit('progress', {'percent': percent, 'speed': speed, 'eta': eta}, namespace='/')
         time.sleep(0.1)  # Força um pequeno atraso para garantir atualizações frequentes
 
 def baixar_playlist(url):
@@ -47,7 +47,7 @@ def baixar_playlist(url):
             file_name = os.path.basename(file_name).replace(' ', '_')
             file_name = os.path.splitext(file_name)[0] + ".mp3"
 
-        socketio.emit('progress', {'percent': '100%', 'speed': 'Finalizado', 'eta': '0s'})  
+        socketio.emit('progress', {'percent': '100%', 'speed': 'Finalizado', 'eta': '0s'}, namespace='/')  
         return file_name
     except Exception as e:
         return f"Erro ao processar a URL: {e}"
@@ -82,4 +82,4 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
