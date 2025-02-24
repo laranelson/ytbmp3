@@ -1,3 +1,7 @@
+import eventlet  # Importando o eventlet para modo assíncrono
+# Habilitar o eventlet
+eventlet.monkey_patch()
+
 import yt_dlp
 from flask import Flask, request, render_template, jsonify, send_from_directory
 from flask_socketio import SocketIO
@@ -5,8 +9,9 @@ import os
 import threading
 import time
 
+
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')  # Usando eventlet
 
 UPLOAD_FOLDER = 'downloads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -23,7 +28,6 @@ def progress_hook(d):
 
         # Enviar progresso ao front-end
         socketio.emit('progress', {'percent': percent, 'speed': speed, 'eta': eta}, namespace='/')
-        #time.sleep(0.1)  # Força um pequeno atraso para garantir atualizações frequentes
 
 def baixar_playlist(url):
     ydl_opts = {
