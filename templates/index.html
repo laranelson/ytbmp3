@@ -21,6 +21,9 @@
             font-size: 18px;
             font-weight: bold;
         }
+        .spinner-border {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -44,7 +47,13 @@
 
             <!-- Link de download -->
             <div class="text-center mt-3">
-                <a id="download-link" href="#" class="btn btn-success" download></a>
+                <a id="download-link" href="#" class="btn btn-success" download onclick="recarregarPagina()">Clique aqui para baixar seu arquivo</a>
+            </div>
+
+            <!-- Spinner de carregamento -->
+            <div id="spinner-container" class="text-center mt-4">
+                <div class="spinner-border text-primary" role="status"></div>
+                <span class="ms-2">Carregando...</span>
             </div>
         </div>
     </div>
@@ -71,7 +80,10 @@
                     progressBar.classList.remove("progress-bar-striped", "progress-bar-animated");
                     progressBar.classList.add("bg-success");
                     progressBar.innerText = "Download Completo!";
-                    setTimeout(() => { progressContainer.style.display = 'none'; }, 5000);
+                    setTimeout(() => { 
+                        progressContainer.style.display = 'none'; 
+                        document.getElementById('spinner-container').style.display = 'none';
+                    }, 5000);
                 }, 500);
             }
         });
@@ -92,11 +104,14 @@
             let url = document.querySelector('input[name="url"]').value;
             let progressContainer = document.getElementById('progress-container');
             let progressBar = document.getElementById('progress-bar');
+            let spinnerContainer = document.getElementById('spinner-container');
 
             progressContainer.style.display = 'block';
             progressBar.classList.add("progress-bar-striped", "progress-bar-animated");
             progressBar.style.width = '0%';
             progressBar.innerText = 'Iniciando...';
+
+            spinnerContainer.style.display = 'block';  // Mostrar o carregamento
 
             fetch('/', {
                 method: 'POST',
@@ -106,6 +121,12 @@
             .then(response => response.json())
             .then(handleDownload)
             .catch(error => console.error('Erro:', error));
+        }
+
+        function recarregarPagina() {
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 2000); // Aguarde 2 segundos antes de recarregar a página
         }
     </script>
 
