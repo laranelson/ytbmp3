@@ -1,11 +1,8 @@
-import sys
-import os
+from flask import Flask
 
-# Adiciona o diretório do projeto ao sys.path
-sys.path.insert(0, os.path.dirname(__file__))
+def create_app():
+    app = Flask(__name__)
 
-# Importa a função create_app
-from app import create_app
+    # Outras configurações e inicializações podem ir aqui, como Blueprints, extensões, etc.
 
-# Cria a aplicação
-application = create_app()  # Agora o Passenger usará a instância `application`
+    return app
