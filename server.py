@@ -1,5 +1,4 @@
 import eventlet  # Importando o eventlet para modo assíncrono
-# Habilitar o eventlet
 eventlet.monkey_patch()
 
 import yt_dlp
@@ -11,7 +10,7 @@ import time
 import requests
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')  # Usando eventlet
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 UPLOAD_FOLDER = 'downloads'
 CACHE_FOLDER = 'cache'
@@ -24,30 +23,24 @@ if not os.path.exists(CACHE_FOLDER):
     os.makedirs(CACHE_FOLDER)
 
 def baixar_arquivo(url, local_path):
-    """Baixa o arquivo apenas se não existir."""
     if not os.path.exists(local_path):
         response = requests.get(url, verify=False)
         if response.status_code == 200:
             with open(local_path, "wb") as f:
                 f.write(response.content)
-        else:
-            print(f"Erro ao baixar {url}: {response.status_code}")
 
 def carregar_arquivos_cache():
-    """Baixa e armazena os arquivos JSON no cache, apenas se o Flask já estiver rodando."""
     arquivos = {
         "tv_player_api.json": "http://127.0.0.1:5000/static/tv-player-api.json",
         "ios_playes_api.json": "http://127.0.0.1:5000/static/ios-playes-api.json",
         "webpage.json": "http://127.0.0.1:5000/static/webpage.json",
         "tv_client_config.json": "http://127.0.0.1:5000/static/tv-client-config.json",
     }
-    
     for nome_arquivo, url in arquivos.items():
         local_path = os.path.join(CACHE_FOLDER, nome_arquivo)
         baixar_arquivo(url, local_path)
 
 def progress_hook(d):
-    """Função chamada durante o download para enviar o progresso ao front-end."""
     if d['status'] == 'downloading':
         percent = d.get('_percent_str', '0%').strip()
         speed = d.get('_speed_str', '0 KiB/s')
@@ -58,11 +51,7 @@ def baixar_playlist(url):
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': os.path.join(app.config['UPLOAD_FOLDER'], '%(title)s.%(ext)s'),
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
+        'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'}],
         'progress_hooks': [progress_hook],
         'ignoreerrors': True,
         'noplaylist': False,
@@ -105,6 +94,5 @@ def index():
         return jsonify({"message": "Download concluído!", "file": file_name})
     return render_template('index.html')
 
-if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
-    carregar_arquivos_cache()  # Agora é chamado após o servidor iniciar
+# 🚀 Exponha a aplicação para o Passenger
+application = app
