@@ -12,6 +12,7 @@ import requests
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
+
 UPLOAD_FOLDER = 'downloads'
 CACHE_FOLDER = 'cache'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
