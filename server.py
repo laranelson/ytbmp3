@@ -10,7 +10,8 @@ import time
 import requests
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+# Inicialize o SocketIO logo após criar o app
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet', transports=['websocket'])
 
 
 UPLOAD_FOLDER = 'downloads'
