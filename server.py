@@ -3,16 +3,12 @@ eventlet.monkey_patch()
 
 import yt_dlp
 from flask import Flask, request, render_template, jsonify, send_from_directory
-from flask_socketio import SocketIO
 import os
 import threading
 import time
 import requests
 
 app = Flask(__name__)
-# Inicialize o SocketIO logo após criar o app
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet', transports=['websocket'])
-
 
 UPLOAD_FOLDER = 'downloads'
 CACHE_FOLDER = 'cache'
@@ -47,7 +43,7 @@ def progress_hook(d):
         percent = d.get('_percent_str', '0%').strip()
         speed = d.get('_speed_str', '0 KiB/s')
         eta = d.get('_eta_str', '0s')
-        socketio.emit('progress', {'percent': percent, 'speed': speed, 'eta': eta}, namespace='/')
+        print(f"Progresso: {percent} | Velocidade: {speed} | ETA: {eta}")
 
 def baixar_playlist(url):
     ydl_opts = {
@@ -67,7 +63,7 @@ def baixar_playlist(url):
             file_name = ydl.prepare_filename(info_dict)
             file_name = os.path.basename(file_name).replace(' ', '_')
             file_name = os.path.splitext(file_name)[0] + ".mp3"
-        socketio.emit('progress', {'percent': '100%', 'speed': 'Finalizado', 'eta': '0s'}, namespace='/')
+        print("Download concluído!")
         return file_name
     except Exception as e:
         return f"Erro ao processar a URL: {e}"
@@ -96,5 +92,5 @@ def index():
         return jsonify({"message": "Download concluído!", "file": file_name})
     return render_template('index.html')
 
-# 🚀 Exponha a aplicação para o Passenger
-application = app
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=True)
